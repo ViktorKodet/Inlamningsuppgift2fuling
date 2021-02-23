@@ -8,6 +8,7 @@ public class Beställning {
     List<Sko> skoList;
     boolean avslutad;
 
+
     Beställning(){
         skoList = Repository.getOrderProducts(this);
     }
