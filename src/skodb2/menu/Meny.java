@@ -61,7 +61,7 @@ public class Meny {
             switch(input) {
                 case "1": shoeMenu();
                     break;
-                case "2": try{Repository.getActiveOrder(k).printAllShoes();
+                case "2": try{Repository.getActiveOrder(k).printAllShoesForOrder();
                 }catch (NullPointerException e){
                     System.out.println("Ingen aktiv beställning hittad.");
                 }

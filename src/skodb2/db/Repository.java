@@ -211,6 +211,32 @@ public class Repository {
         return out;
     }
 
+    public static List<Beställning> getAllOrders(Kund k){
+        List<Beställning> out = new ArrayList<>();
+        try (Connection con = DriverManager.getConnection(
+                properties.getProperty("dbString"),
+                properties.getProperty("username"),
+                properties.getProperty("password"))) {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+
+            PreparedStatement pstmt = con.prepareStatement("select * from beställning where kundid=?");
+            pstmt.setInt(1, k.getId());
+            ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                Beställning temp = new Beställning();
+                temp.setId(rs.getInt("id"));
+                temp.setKundid(k.getId());
+                temp.setSkoList(getOrderProducts(temp));
+                temp.setAvslutad(rs.getBoolean("avslutad"));
+                out.add(temp);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return out;
+    }
+
     public static List<Sko> getOrderProducts(Beställning b) {
         List<Sko> out = new ArrayList<>();
         try (Connection con = DriverManager.getConnection(
@@ -264,17 +290,43 @@ public class Repository {
                 properties.getProperty("username"),
                 properties.getProperty("password"))) {
             Class.forName("com.mysql.cj.jdbc.Driver");
+            boolean inStock = isInStock(skoid);
             CallableStatement pstmt = con.prepareCall("call addToCart(?, ?, ?)");
             pstmt.setInt(1, kundid);
             pstmt.setInt(2, beställningsid);
             pstmt.setInt(3, skoid);
             pstmt.execute();
-            System.out.println("Sko tillagd i beställningen");
+            System.out.println(inStock ? "Sko tillagd i beställningen" : "Sko tillagd men finns inte i lager.");
         }catch(SQLException e){
             System.out.println(e.getMessage());
         }catch(ClassNotFoundException e2){
             e2.printStackTrace();
         }
+    }
+
+    public static boolean isInStock(int skoid){
+        int i = 0;
+        try (Connection con = DriverManager.getConnection(
+                properties.getProperty("dbString"),
+                properties.getProperty("username"),
+                properties.getProperty("password"))) {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            PreparedStatement stmt = con.prepareStatement("select lagerstatus from sko where id = ?");
+            stmt.setInt(1, skoid);
+            ResultSet rs = stmt.executeQuery();
+
+            while(rs.next()){
+                if(rs.wasNull()){
+                    break;
+                }
+                i = rs.getInt("lagerstatus");
+            }
+        }catch(SQLException e){
+            System.out.println(e.getMessage());
+        }catch(ClassNotFoundException e2){
+            e2.printStackTrace();
+        }
+        return i != 0;
     }
 
     public static void rateShoe(int skoid, int kundid, int betyg, String kommentar){

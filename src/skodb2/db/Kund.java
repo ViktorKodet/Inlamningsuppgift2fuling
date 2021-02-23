@@ -2,6 +2,7 @@ package skodb2.db;
 
 import java.time.LocalDate;
 import java.util.Date;
+import java.util.List;
 
 public class Kund {
 
@@ -12,6 +13,11 @@ public class Kund {
     private String lösenord;
     private Date created;
     private Date lastUpdated;
+    List<Beställning> beställningList;
+
+    Kund(){
+        beställningList = Repository.getAllOrders(this);
+    }
 
     public int getId() {
         return id;

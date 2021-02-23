@@ -25,6 +25,10 @@ public class Sko {
         return String.format("%-30s %-10d %-10d %-15s %-10d", namn, pris , storlek, färg, lagerstatus);
     }
 
+    public String toStringForOrder(){
+        return String.format("%-30s %-10d %-10d %-15s", namn, pris , storlek, färg);
+    }
+
 
     @Override
     public String toString() {

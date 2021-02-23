@@ -14,6 +14,12 @@ public class Beställning {
         }
     }
 
+    public void printAllShoesForOrder(){
+        for (Sko s : skoList){
+            System.out.println(s.toStringForOrder());
+        }
+    }
+
     public int getId() {
         return id;
     }
