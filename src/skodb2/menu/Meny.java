@@ -6,6 +6,7 @@ import skodb2.db.Repository;
 import skodb2.db.Sko;
 
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Scanner;
 
@@ -85,12 +86,15 @@ public class Meny {
             System.out.println("Mata in en siffra i consolen för att välja alternativ:" +
                     "\n 1: Beställ en sko" +
                     "\n 2: Betygsätt en sko" +
+                    "\n 3: Visa betyg på en sko" +
                     "\n 0: Tillbaka till huvudmenyn");
             input = scan.nextLine();
             switch (input) {
                 case "1": shoeOrderMenu();
                     break;
                 case "2": shoeRatingMenu();
+                    break;
+                case "3": showShoeRatingMenu();
                     break;
                 case "0": return;
                 default:
@@ -112,21 +116,39 @@ public class Meny {
 
         try{
             Repository.addToCart(k.getId(), Repository.getActiveOrderId(k), Repository.getShoeId(name, color, size));
-            System.out.println("Sko tillagd.");
+
         }catch (Exception e){
+            System.out.println(e.getMessage());
             e.printStackTrace();
         }
-    }
 
+    }
+    public void showShoeRatingMenu(){
+        System.out.println("Mata in skons namn:");
+        String name = scan.nextLine();
+        System.out.println("Mata in skons färg:");
+        String color = scan.nextLine();
+        System.out.println("Mata in skons storlek:");
+        String sizeString = scan.nextLine();
+        int size = Integer.parseInt(sizeString);
+
+        try{
+            Repository.printAvgRatingAndComments(Repository.getShoeId(name, color, size));
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+        }
+    }
     public void shoeRatingMenu(){
         System.out.println("Mata in skons namn:");
         String name = scan.nextLine();
         System.out.println("Mata in skons färg:");
         String color = scan.nextLine();
         System.out.println("Mata in skons storlek:");
-        int size = scan.nextInt();
+        String sizeString = scan.nextLine();
+        int size = Integer.parseInt(sizeString);
         System.out.println("Mata in ditt betyg (1-10):");
-        int betyg = scan.nextInt();
+        String betygString = scan.nextLine();
+        int betyg = Integer.parseInt(betygString);
         System.out.println("Mata in din kommentar:");
         String kommentar = scan.nextLine();
         try{

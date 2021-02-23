@@ -293,6 +293,58 @@ public class Repository {
         }
     }
 
+    public static void printAvgRatingAndComments(int shoeid){
+        System.out.println("Genomsnittligt betyg : " + getAvgRating(shoeid));
+        System.out.println("Kommentarer:");
+        getComments(shoeid).forEach(System.out::println);
+
+    }
+
+    public static double getAvgRating(int shoeid){
+        if(shoeid<0){
+            throw new IllegalStateException("Nåt gick fel");
+        }
+        double out =-1;
+        try (Connection con = DriverManager.getConnection(
+                properties.getProperty("dbString"),
+                properties.getProperty("username"),
+                properties.getProperty("password"))) {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            CallableStatement pstmt = con.prepareCall("call getProdAvg(?, ?)");
+
+            pstmt.registerOutParameter(2, Types.DOUBLE);
+            pstmt.setInt(1, shoeid);
+            pstmt.execute();
+            out = pstmt.getDouble(2);
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        return out;
+    }
+
+    public static List<String> getComments(int shoeid){
+        if(shoeid<0){
+            throw new IllegalStateException("Nåt gick fel");
+        }
+        List<String> out = new ArrayList<>();
+        try (Connection con = DriverManager.getConnection(
+                properties.getProperty("dbString"),
+                properties.getProperty("username"),
+                properties.getProperty("password"))) {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+
+            PreparedStatement pstmt = con.prepareStatement("select kommentar from betygsättning where skoid like ? and kommentar is not null");
+            pstmt.setInt(1, shoeid);
+            ResultSet rs = pstmt.executeQuery();
+            while(rs.next()){
+                out.add(rs.getString("kommentar"));
+            }
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        return out;
+    }
+
 
 
 }
