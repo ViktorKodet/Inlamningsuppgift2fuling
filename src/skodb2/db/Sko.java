@@ -1,6 +1,7 @@
 package skodb2.db;
 
 import java.sql.Date;
+import java.util.List;
 
 public class Sko {
 
@@ -13,6 +14,7 @@ public class Sko {
     private int lagerstatus;
     private Date created;
     private Date lastUpdated;
+    private List<Kategori> kategoriList;
 
     Sko(){
 

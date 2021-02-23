@@ -11,11 +11,12 @@ import java.util.stream.Collectors;
 public class Repository {
 
     private static Properties properties = new Properties();
-    static List<Märke> märkeList;
+
 
     static {
         loadProperties();
-        märkeList = getAllBrands();
+        Märke.allBrands = getAllBrands();
+        Kategori.allCategories = getAllCategories();
     }
 
     private static void loadProperties() {
@@ -68,6 +69,31 @@ public class Repository {
 
             while (rs.next()) {
                 Märke temp = new Märke();
+                temp.setId(rs.getInt("id"));
+                temp.setNamn(rs.getString("namn"));
+                temp.setCreated(rs.getDate("created"));
+                temp.setLastUpdated(rs.getDate("lastUpdated"));
+                out.add(temp);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return out;
+    }
+
+    public static List<Kategori> getAllCategories() {
+        List<Kategori> out = new ArrayList<>();
+        try (Connection con = DriverManager.getConnection(
+                properties.getProperty("dbString"),
+                properties.getProperty("username"),
+                properties.getProperty("password"))) {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+
+            PreparedStatement pstmt = con.prepareStatement("select * from kategori");
+            ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                Kategori temp = new Kategori();
                 temp.setId(rs.getInt("id"));
                 temp.setNamn(rs.getString("namn"));
                 temp.setCreated(rs.getDate("created"));
@@ -260,7 +286,7 @@ public class Repository {
                 temp.setNamn(rs.getString("namn"));
                 temp.setPris(rs.getInt("pris"));
                 int märkeid = rs.getInt("märkeid");
-                temp.setMärke(märkeList.stream().filter(n -> n.id == märkeid).collect(Collectors.toList()).get(0));
+                temp.setMärke(Märke.allBrands.stream().filter(n -> n.id == märkeid).collect(Collectors.toList()).get(0));
                 temp.setStorlek(rs.getInt("storlek"));
                 temp.setFärg(rs.getString("färg"));
                 temp.setLagerstatus(rs.getInt("lagerstatus"));

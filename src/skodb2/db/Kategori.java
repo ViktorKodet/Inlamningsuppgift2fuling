@@ -1,8 +1,11 @@
 package skodb2.db;
 
 import java.sql.Date;
+import java.util.List;
 
 public class Kategori {
+
+    public static List<Kategori> allCategories;
 
     private int id;
     private String namn;
@@ -13,6 +16,8 @@ public class Kategori {
         this.id = id;
         this.namn = namn;
     }
+
+    public Kategori(){}
 
     public int getId() {
         return id;

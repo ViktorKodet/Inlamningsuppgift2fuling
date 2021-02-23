@@ -151,7 +151,7 @@ public class Meny {
         System.out.println("Mata in skons storlek:");
         String sizeString = scan.nextLine();
         int size = Integer.parseInt(sizeString);
-        System.out.println("Mata in ditt betyg (1-10):");
+        System.out.println("Mata in ditt betyg (1-5):");
         String betygString = scan.nextLine();
         int betyg = Integer.parseInt(betygString);
         System.out.println("Mata in din kommentar:");
