@@ -1,6 +1,7 @@
 package skodb2.db;
 
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Sko {
@@ -14,10 +15,11 @@ public class Sko {
     private int lagerstatus;
     private Date created;
     private Date lastUpdated;
+
     private List<Kategori> kategoriList;
 
     Sko(){
-
+       kategoriList = new ArrayList<>();
     }
 
     public Märke getMärke() {
@@ -42,6 +44,10 @@ public class Sko {
     }
 
     public String toStringForOrder(){
+        System.out.println("*****************KOLLA HÄR*****************");
+        for (Kategori k : getKategoriList()) {
+            System.out.println(k);
+        }
         return String.format("%-30s %-10d %-10d %-15s", namn, pris , storlek, färg);
     }
 
@@ -114,5 +120,9 @@ public class Sko {
 
     public void setLastUpdated(Date lastUpdated) {
         this.lastUpdated = lastUpdated;
+    }
+
+    public List<Kategori> getKategoriList() {
+        return kategoriList;
     }
 }

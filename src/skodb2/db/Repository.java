@@ -1,5 +1,7 @@
 package skodb2.db;
 
+import jdk.jfr.Category;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.*;
@@ -194,7 +196,7 @@ public class Repository {
         return out;
     }
 
-    public static int getActiveOrderId(Kund k){
+    public static int getActiveOrderId(Kund k) {
         int out = -1;
         try (Connection con = DriverManager.getConnection(
                 properties.getProperty("dbString"),
@@ -215,7 +217,7 @@ public class Repository {
         return out;
     }
 
-    public static Beställning getActiveOrder(Kund k){
+    public static Beställning getActiveOrder(Kund k) {
         Beställning out = new Beställning();
         try (Connection con = DriverManager.getConnection(
                 properties.getProperty("dbString"),
@@ -241,7 +243,29 @@ public class Repository {
         return out;
     }
 
-    public static List<Beställning> getAllOrders(Kund k){
+    public static void parseShoeCategories(Sko s) {
+        try (Connection con = DriverManager.getConnection(
+                properties.getProperty("dbString"),
+                properties.getProperty("username"),
+                properties.getProperty("password"))) {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            PreparedStatement pstmt = con.prepareStatement(" select * from skokategorimap where skoid = ?");
+            pstmt.setInt(1, s.getId());
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                int temp = rs.getInt("kategoriid");
+                for (Kategori k : Kategori.allCategories) {
+                    if (k.getId() == temp)
+                        s.getKategoriList().add(k);
+                }
+            Thread.sleep(10);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static List<Beställning> getAllOrders(Kund k) {
         List<Beställning> out = new ArrayList<>();
         try (Connection con = DriverManager.getConnection(
                 properties.getProperty("dbString"),
@@ -292,6 +316,7 @@ public class Repository {
                 temp.setLagerstatus(rs.getInt("lagerstatus"));
                 temp.setCreated(rs.getDate("created"));
                 temp.setLastUpdated(rs.getDate("lastUpdated"));
+                parseShoeCategories(temp);
                 out.add(temp);
             }
         } catch (Exception e) {
@@ -300,7 +325,7 @@ public class Repository {
         return out;
     }
 
-    public static void finalizeOrder(int beställningsid){
+    public static void finalizeOrder(int beställningsid) {
         try (Connection con = DriverManager.getConnection(
                 properties.getProperty("dbString"),
                 properties.getProperty("username"),
@@ -311,12 +336,12 @@ public class Repository {
             int i = pstmt.executeUpdate();
             System.out.println(i + " rader påverkade");
             System.out.println("Beställning färdigställd");
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public static void addToCart(int kundid, int beställningsid, int skoid){
+    public static void addToCart(int kundid, int beställningsid, int skoid) {
         try (Connection con = DriverManager.getConnection(
                 properties.getProperty("dbString"),
                 properties.getProperty("username"),
@@ -329,14 +354,14 @@ public class Repository {
             pstmt.setInt(3, skoid);
             pstmt.execute();
             System.out.println(inStock ? "Sko tillagd i beställningen" : "Sko tillagd men finns inte i lager.");
-        }catch(SQLException e){
+        } catch (SQLException e) {
             System.out.println(e.getMessage());
-        }catch(ClassNotFoundException e2){
+        } catch (ClassNotFoundException e2) {
             e2.printStackTrace();
         }
     }
 
-    public static boolean isInStock(int skoid){
+    public static boolean isInStock(int skoid) {
         int i = 0;
         try (Connection con = DriverManager.getConnection(
                 properties.getProperty("dbString"),
@@ -347,21 +372,21 @@ public class Repository {
             stmt.setInt(1, skoid);
             ResultSet rs = stmt.executeQuery();
 
-            while(rs.next()){
-                if(rs.wasNull()){
+            while (rs.next()) {
+                if (rs.wasNull()) {
                     break;
                 }
                 i = rs.getInt("lagerstatus");
             }
-        }catch(SQLException e){
+        } catch (SQLException e) {
             System.out.println(e.getMessage());
-        }catch(ClassNotFoundException e2){
+        } catch (ClassNotFoundException e2) {
             e2.printStackTrace();
         }
         return i != 0;
     }
 
-    public static void rateShoe(int skoid, int kundid, int betyg, String kommentar){
+    public static void rateShoe(int skoid, int kundid, int betyg, String kommentar) {
         try (Connection con = DriverManager.getConnection(
                 properties.getProperty("dbString"),
                 properties.getProperty("username"),
@@ -374,12 +399,12 @@ public class Repository {
             pstmt.setString(4, kommentar);
             pstmt.execute();
             System.out.println("Sko Betygsatt");
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public static Ort getOrtFromDB(int kundid){
+    public static Ort getOrtFromDB(int kundid) {
         Ort temp = null;
         try (Connection con = DriverManager.getConnection(
                 properties.getProperty("dbString"),
@@ -389,27 +414,27 @@ public class Repository {
             PreparedStatement stmt = con.prepareStatement("select * from ort join kund on kund.ortid=ort.id where kund.id=?");
             stmt.setInt(1, kundid);
             ResultSet rs = stmt.executeQuery();
-            while(rs.next()){
-                temp = new Ort(rs.getInt("id") , rs.getString("namn"));
+            while (rs.next()) {
+                temp = new Ort(rs.getInt("id"), rs.getString("namn"));
             }
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return temp;
     }
 
-    public static void printAvgRatingAndComments(int shoeid){
+    public static void printAvgRatingAndComments(int shoeid) {
         System.out.println("Genomsnittligt betyg : " + getAvgRating(shoeid));
         System.out.println("Kommentarer:");
         getComments(shoeid).forEach(System.out::println);
 
     }
 
-    public static double getAvgRating(int shoeid){
-        if(shoeid<0){
+    public static double getAvgRating(int shoeid) {
+        if (shoeid < 0) {
             throw new IllegalStateException("Nåt gick fel");
         }
-        double out =-1;
+        double out = -1;
         try (Connection con = DriverManager.getConnection(
                 properties.getProperty("dbString"),
                 properties.getProperty("username"),
@@ -421,14 +446,14 @@ public class Repository {
             pstmt.setInt(1, shoeid);
             pstmt.execute();
             out = pstmt.getDouble(2);
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return out;
     }
 
-    public static List<String> getComments(int shoeid){
-        if(shoeid<0){
+    public static List<String> getComments(int shoeid) {
+        if (shoeid < 0) {
             throw new IllegalStateException("Nåt gick fel");
         }
         List<String> out = new ArrayList<>();
@@ -441,16 +466,16 @@ public class Repository {
             PreparedStatement pstmt = con.prepareStatement("select kommentar from betygsättning where skoid like ? and kommentar is not null");
             pstmt.setInt(1, shoeid);
             ResultSet rs = pstmt.executeQuery();
-            while(rs.next()){
+            while (rs.next()) {
                 out.add(rs.getString("kommentar"));
             }
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return out;
     }
 
-    public static List<Slutilager> getOutOfStock(){
+    public static List<Slutilager> getOutOfStock() {
         List<Slutilager> out = new ArrayList<>();
         try (Connection con = DriverManager.getConnection(
                 properties.getProperty("dbString"),
@@ -460,19 +485,18 @@ public class Repository {
 
             PreparedStatement pstmt = con.prepareStatement("select * from slutilager");
             ResultSet rs = pstmt.executeQuery();
-            while(rs.next()){
+            while (rs.next()) {
                 Slutilager temp = new Slutilager();
                 temp.setId(rs.getInt("id"));
                 temp.setSkoid(rs.getInt("skoid")); //hämta sko objekt?
                 temp.setDatum(rs.getDate("datum"));
                 out.add(temp);
             }
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return out;
     }
-
 
 
 }
