@@ -46,10 +46,12 @@ public class Meny {
     }
 
     public void mainMenu(){
+        System.out.println();
         System.out.println("Välkommen " + k.getNamn());
         String input;
         Boolean inloggad = true;
         while(inloggad){
+            System.out.println();
             System.out.println("Mata in en siffra i consolen för att välja alternativ:" +
                     "\n 1: Sko-menyn" +
                     "\n 2: Se din beställning" +
@@ -78,11 +80,14 @@ public class Meny {
 
     public void shoeMenu(){
         List<Sko> skoList = Repository.getAllActiveShoes();
+        System.out.printf("%-30s %-10s %-10s %-15s %-10s", "NAMN", "PRIS" , "STORLEK", "FÄRG", "LAGERSTATUS\n");
+        System.out.println("--------------------------------------------------------------------------------");
         for(Sko sko : skoList){
             System.out.println(sko.toStringForCustomer());
         }
         String input;
         while(true) {
+            System.out.println();
             System.out.println("Mata in en siffra i consolen för att välja alternativ:" +
                     "\n 1: Beställ en sko" +
                     "\n 2: Betygsätt en sko" +
@@ -118,12 +123,13 @@ public class Meny {
             Repository.addToCart(k.getId(), Repository.getActiveOrderId(k), Repository.getShoeId(name, color, size));
 
         }catch (Exception e){
-            System.out.println(e.getMessage());
+            System.out.println("SQL : " + e.getMessage());
             e.printStackTrace();
         }
 
     }
     public void showShoeRatingMenu(){
+        try{
         System.out.println("Mata in skons namn:");
         String name = scan.nextLine();
         System.out.println("Mata in skons färg:");
@@ -132,10 +138,9 @@ public class Meny {
         String sizeString = scan.nextLine();
         int size = Integer.parseInt(sizeString);
 
-        try{
             Repository.printAvgRatingAndComments(Repository.getShoeId(name, color, size));
         }catch (Exception e){
-            System.out.println(e.getMessage());
+            System.out.println("Ogiltliga värden");
         }
     }
     public void shoeRatingMenu(){

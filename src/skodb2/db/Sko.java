@@ -14,11 +14,15 @@ public class Sko {
     private Date lastUpdated;
 
     public String toStringForCustomer(){
+        /*
         return "namn='" + namn + '\'' +
                 ", pris=" + pris +
                 ", storlek=" + storlek +
                 ", färg='" + färg + '\'' +
                 ", lagerstatus=" + lagerstatus;
+         */
+        //return String.format("%s \n %d \t\t %d \t\t %s \t\t %d", namn, pris , storlek, färg, lagerstatus);
+        return String.format("%-30s %-10d %-10d %-15s %-10d", namn, pris , storlek, färg, lagerstatus);
     }
 
 

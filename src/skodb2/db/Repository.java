@@ -270,8 +270,10 @@ public class Repository {
             pstmt.setInt(3, skoid);
             pstmt.execute();
             System.out.println("Sko tillagd i beställningen");
-        }catch(Exception e){
-            e.printStackTrace();
+        }catch(SQLException e){
+            System.out.println(e.getMessage());
+        }catch(ClassNotFoundException e2){
+            e2.printStackTrace();
         }
     }
 
@@ -338,6 +340,29 @@ public class Repository {
             ResultSet rs = pstmt.executeQuery();
             while(rs.next()){
                 out.add(rs.getString("kommentar"));
+            }
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        return out;
+    }
+
+    public static List<Slutilager> getOutOfStock(){
+        List<Slutilager> out = new ArrayList<>();
+        try (Connection con = DriverManager.getConnection(
+                properties.getProperty("dbString"),
+                properties.getProperty("username"),
+                properties.getProperty("password"))) {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+
+            PreparedStatement pstmt = con.prepareStatement("select * from slutilager");
+            ResultSet rs = pstmt.executeQuery();
+            while(rs.next()){
+                Slutilager temp = new Slutilager();
+                temp.setId(rs.getInt("id"));
+                temp.setSkoid(rs.getInt("skoid")); //hämta sko objekt?
+                temp.setDatum(rs.getDate("datum"));
+                out.add(temp);
             }
         }catch(Exception e){
             e.printStackTrace();
