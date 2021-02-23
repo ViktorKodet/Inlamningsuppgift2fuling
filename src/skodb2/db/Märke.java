@@ -8,7 +8,7 @@ public class Märke {
     String namn;
     private Date created;
     private Date lastUpdated;
-    private static List<Märke> allBrands = Repository.getAllBrands();
+    static List<Märke> allBrands;
 
     public String getNamn() {
         return namn;
