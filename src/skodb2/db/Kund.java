@@ -17,6 +17,7 @@ public class Kund {
 
     Kund(){
         beställningList = Repository.getAllOrders(this);
+        beställningList.forEach(e -> e.setKund(this));
     }
 
     public int getId() {

@@ -4,9 +4,13 @@ import java.util.List;
 
 public class Beställning {
     int id;
-    int kundid;
+    Kund kund;
     List<Sko> skoList;
     boolean avslutad;
+
+    Beställning(){
+        skoList = Repository.getOrderProducts(this);
+    }
 
     public void printAllShoes(){
         for (Sko s : skoList){
@@ -28,12 +32,12 @@ public class Beställning {
         this.id = id;
     }
 
-    public int getKundid() {
-        return kundid;
+    public Kund getKund() {
+        return kund;
     }
 
-    public void setKundid(int kundid) {
-        this.kundid = kundid;
+    public void setKund(Kund kund) {
+        this.kund = kund;
     }
 
     public List<Sko> getSkoList() {
