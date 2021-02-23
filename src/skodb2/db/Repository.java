@@ -200,7 +200,7 @@ public class Repository {
             while (rs.next()) {
                 Beställning temp = new Beställning();
                 temp.setId(rs.getInt("id"));
-                temp.setKundid(k.getId());
+                temp.setKund(k);
                 temp.setSkoList(getOrderProducts(temp));
                 temp.setAvslutad(rs.getBoolean("avslutad"));
                 out = temp;
@@ -226,7 +226,7 @@ public class Repository {
             while (rs.next()) {
                 Beställning temp = new Beställning();
                 temp.setId(rs.getInt("id"));
-                temp.setKundid(k.getId());
+                temp.setKund(k);
                 temp.setSkoList(getOrderProducts(temp));
                 temp.setAvslutad(rs.getBoolean("avslutad"));
                 out.add(temp);
