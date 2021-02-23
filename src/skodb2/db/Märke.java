@@ -1,13 +1,14 @@
 package skodb2.db;
 
 import java.sql.Date;
+import java.util.List;
 
 public class Märke {
     int id;
     String namn;
     private Date created;
     private Date lastUpdated;
-
+    private static List<Märke> allBrands = Repository.getAllBrands();
 
     public String getNamn() {
         return namn;
