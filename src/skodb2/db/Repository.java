@@ -172,7 +172,7 @@ public class Repository {
                 properties.getProperty("password"))) {
             Class.forName("com.mysql.cj.jdbc.Driver");
 
-            PreparedStatement pstmt = con.prepareStatement("select * from beställning where kundid=?");
+            PreparedStatement pstmt = con.prepareStatement("select * from beställning where kundid=? and avslutad=false");
             pstmt.setInt(1, k.getId());
             ResultSet rs = pstmt.executeQuery();
 
@@ -193,7 +193,7 @@ public class Repository {
                 properties.getProperty("password"))) {
             Class.forName("com.mysql.cj.jdbc.Driver");
 
-            PreparedStatement pstmt = con.prepareStatement("select * from beställning where kundid=?");
+            PreparedStatement pstmt = con.prepareStatement("select * from beställning where kundid=? and avslutad=false");
             pstmt.setInt(1, k.getId());
             ResultSet rs = pstmt.executeQuery();
 

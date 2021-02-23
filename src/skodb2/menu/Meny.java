@@ -58,7 +58,10 @@ public class Meny {
             switch(input) {
                 case "1": shoeMenu();
                     break;
-                case "2": Repository.getActiveOrder(k).printAllShoes();
+                case "2": try{Repository.getActiveOrder(k).printAllShoes();
+                }catch (NullPointerException e){
+                    System.out.println("Ingen aktiv beställning hittad.");
+                }
                     break;
                 case "3": Repository.finalizeOrder(Repository.getActiveOrderId(k));
                     break;
@@ -104,7 +107,8 @@ public class Meny {
         System.out.println("Mata in skons färg:");
         String color = scan.nextLine();
         System.out.println("Mata in skons storlek:");
-        int size = scan.nextInt();
+        String sizeString = scan.nextLine();
+        int size = Integer.parseInt(sizeString);
 
         try{
             Repository.addToCart(k.getId(), Repository.getActiveOrderId(k), Repository.getShoeId(name, color, size));
