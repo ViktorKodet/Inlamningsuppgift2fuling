@@ -166,5 +166,4 @@ public class Meny {
     public static void main(String[] args) {
         new Meny();
     }
-
 }
