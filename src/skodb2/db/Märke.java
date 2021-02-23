@@ -8,6 +8,7 @@ public class Märke {
     private Date created;
     private Date lastUpdated;
 
+
     public String getNamn() {
         return namn;
     }

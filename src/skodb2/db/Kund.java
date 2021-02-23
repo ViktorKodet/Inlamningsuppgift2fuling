@@ -1,6 +1,5 @@
 package skodb2.db;
 
-import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -8,7 +7,7 @@ public class Kund {
 
     private int id;
     private String namn;
-    private int ortid;
+    private Ort ort;
     private String användarnamn;
     private String lösenord;
     private Date created;
@@ -37,12 +36,12 @@ public class Kund {
         this.namn = namn;
     }
 
-    public int getOrtid() {
-        return ortid;
+    public Ort getOrt() {
+        return ort;
     }
 
-    public void setOrtid(int ortid) {
-        this.ortid = ortid;
+    public void setOrt(Ort ort) {
+        this.ort = ort;
     }
 
     public String getAnvändarnamn() {
@@ -82,7 +81,7 @@ public class Kund {
         return "Kund{" +
                 "id=" + id +
                 ", namn='" + namn + '\'' +
-                ", ortid=" + ortid +
+                ", ort=" + ort.getNamn() +
                 ", användarnamn='" + användarnamn + '\'' +
                 ", lösenord='" + lösenord + '\'' +
                 ", created=" + created +
