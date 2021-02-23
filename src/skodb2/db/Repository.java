@@ -6,6 +6,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 public class Repository {
 
@@ -258,6 +259,8 @@ public class Repository {
                 temp.setId(rs.getInt("id"));
                 temp.setNamn(rs.getString("namn"));
                 temp.setPris(rs.getInt("pris"));
+                int märkeid = rs.getInt("märkeid");
+                temp.setMärke(märkeList.stream().filter(n -> n.id == märkeid).collect(Collectors.toList()).get(0));
                 temp.setStorlek(rs.getInt("storlek"));
                 temp.setFärg(rs.getString("färg"));
                 temp.setLagerstatus(rs.getInt("lagerstatus"));
