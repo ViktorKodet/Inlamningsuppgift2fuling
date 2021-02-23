@@ -10,9 +10,11 @@ import java.util.Properties;
 public class Repository {
 
     private static Properties properties = new Properties();
+    static List<Märke> märkeList;
 
     static {
         loadProperties();
+        märkeList = getAllBrands();
     }
 
     private static void loadProperties() {
@@ -23,6 +25,7 @@ public class Repository {
             e.printStackTrace();
         }
     }
+
 
     public static List<Kund> getAllCustomers() {
         List<Kund> kundList = new ArrayList<>();
@@ -39,7 +42,7 @@ public class Repository {
                 Kund temp = new Kund();
                 temp.setId(rs.getInt("id"));
                 temp.setNamn(rs.getString("namn"));
-                temp.setOrtid(rs.getInt("ortid"));
+                temp.setOrt(getOrtFromDB(temp.getId()));
                 temp.setAnvändarnamn(rs.getString("användarnamn"));
                 temp.setLösenord(rs.getString("lösenord"));
 
@@ -200,7 +203,7 @@ public class Repository {
             while (rs.next()) {
                 Beställning temp = new Beställning();
                 temp.setId(rs.getInt("id"));
-                temp.setKundid(k.getId());
+                temp.setKund(k);
                 temp.setSkoList(getOrderProducts(temp));
                 temp.setAvslutad(rs.getBoolean("avslutad"));
                 out = temp;
@@ -226,7 +229,7 @@ public class Repository {
             while (rs.next()) {
                 Beställning temp = new Beställning();
                 temp.setId(rs.getInt("id"));
-                temp.setKundid(k.getId());
+                temp.setKund(k);
                 temp.setSkoList(getOrderProducts(temp));
                 temp.setAvslutad(rs.getBoolean("avslutad"));
                 out.add(temp);
@@ -345,6 +348,25 @@ public class Repository {
         }catch(Exception e){
             e.printStackTrace();
         }
+    }
+
+    public static Ort getOrtFromDB(int kundid){
+        Ort temp = null;
+        try (Connection con = DriverManager.getConnection(
+                properties.getProperty("dbString"),
+                properties.getProperty("username"),
+                properties.getProperty("password"))) {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            PreparedStatement stmt = con.prepareStatement("select * from ort join kund on kund.ortid=ort.id where kund.id=?");
+            stmt.setInt(1, kundid);
+            ResultSet rs = stmt.executeQuery();
+            while(rs.next()){
+                temp = new Ort(rs.getInt("id") , rs.getString("namn"));
+            }
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        return temp;
     }
 
     public static void printAvgRatingAndComments(int shoeid){

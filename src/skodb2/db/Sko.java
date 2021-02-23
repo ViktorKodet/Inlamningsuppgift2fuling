@@ -8,10 +8,24 @@ public class Sko {
     private String namn;
     private int pris;
     private int storlek;
+    private Märke märke;
     private String färg;
     private int lagerstatus;
     private Date created;
     private Date lastUpdated;
+
+    Sko(){
+
+    }
+
+    public Märke getMärke() {
+        return märke;
+    }
+
+    public void setMärke(Märke märke) {
+        this.märke = märke;
+    }
+
 
     public String toStringForCustomer(){
         /*
