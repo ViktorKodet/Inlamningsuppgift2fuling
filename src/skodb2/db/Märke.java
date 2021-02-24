@@ -8,7 +8,7 @@ public class Märke {
     String namn;
     private Date created;
     private Date lastUpdated;
-    static List<Märke> allBrands;
+    public static List<Märke> allBrands;
 
     public String getNamn() {
         return namn;

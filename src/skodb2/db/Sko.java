@@ -44,10 +44,6 @@ public class Sko {
     }
 
     public String toStringForOrder(){
-        System.out.println("*****************KOLLA HÄR*****************");
-        for (Kategori k : getKategoriList()) {
-            System.out.println(k);
-        }
         return String.format("%-30s %-10d %-10d %-15s", namn, pris , storlek, färg);
     }
 

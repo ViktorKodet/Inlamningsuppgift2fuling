@@ -14,11 +14,11 @@ public class Repository {
 
     private static Properties properties = new Properties();
 
-
     static {
         loadProperties();
         Märke.allBrands = getAllBrands();
         Kategori.allCategories = getAllCategories();
+        SkoKategoriMap.allShoeCategoryMappings = getAllShoeCategoryMappings();
     }
 
     private static void loadProperties() {
@@ -29,7 +29,6 @@ public class Repository {
             e.printStackTrace();
         }
     }
-
 
     public static List<Kund> getAllCustomers() {
         List<Kund> kundList = new ArrayList<>();
@@ -243,27 +242,26 @@ public class Repository {
         return out;
     }
 
-    public static void parseShoeCategories(Sko s) {
-        try (Connection con = DriverManager.getConnection(
-                properties.getProperty("dbString"),
-                properties.getProperty("username"),
-                properties.getProperty("password"))) {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            PreparedStatement pstmt = con.prepareStatement(" select * from skokategorimap where skoid = ?");
-            pstmt.setInt(1, s.getId());
-            ResultSet rs = pstmt.executeQuery();
-            while (rs.next()) {
-                int temp = rs.getInt("kategoriid");
-                for (Kategori k : Kategori.allCategories) {
-                    if (k.getId() == temp)
-                        s.getKategoriList().add(k);
-                }
-            Thread.sleep(10);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+//    public static void parseShoeCategories(Sko s) {
+//        try (Connection con = DriverManager.getConnection(
+//                properties.getProperty("dbString"),
+//                properties.getProperty("username"),
+//                properties.getProperty("password"))) {
+//            Class.forName("com.mysql.cj.jdbc.Driver");
+//            PreparedStatement pstmt = con.prepareStatement("select * from skokategorimap where skoid = ?");
+//            pstmt.setInt(1, s.getId());
+//            ResultSet rs = pstmt.executeQuery();
+//            while (rs.next()) {
+//                int temp = rs.getInt("kategoriId");
+//                for (Kategori k : Kategori.allCategories) {
+//                    if (k.getId() == temp)
+//                        s.getKategoriList().add(k);
+//                }
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//    }
 
     public static List<Beställning> getAllOrders(Kund k) {
         List<Beställning> out = new ArrayList<>();
@@ -283,6 +281,30 @@ public class Repository {
                 temp.setKund(k);
                 temp.setSkoList(getOrderProducts(temp));
                 temp.setAvslutad(rs.getBoolean("avslutad"));
+                out.add(temp);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return out;
+    }
+
+    public static List<SkoKategoriMap> getAllShoeCategoryMappings() {
+        List<SkoKategoriMap> out = new ArrayList<>();
+        try (Connection con = DriverManager.getConnection(
+                properties.getProperty("dbString"),
+                properties.getProperty("username"),
+                properties.getProperty("password"))) {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+
+            PreparedStatement pstmt = con.prepareStatement("select * from skokategorimap");
+            ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                SkoKategoriMap temp = new SkoKategoriMap();
+                temp.setId(rs.getInt("id"));
+                temp.setSkoId(rs.getInt("skoid"));
+                temp.setKategoriId(rs.getInt("kategoriid"));
                 out.add(temp);
             }
         } catch (Exception e) {
@@ -316,13 +338,32 @@ public class Repository {
                 temp.setLagerstatus(rs.getInt("lagerstatus"));
                 temp.setCreated(rs.getDate("created"));
                 temp.setLastUpdated(rs.getDate("lastUpdated"));
-                parseShoeCategories(temp);
+                fillShoeCategoriesList(temp);
+
+                System.out.println("* * * * * * * * * * * * * HEJ * * * * * * * * * * * * *");
+                System.out.println(temp.getKategoriList());
+
+//                parseShoeCategories(temp);
                 out.add(temp);
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
         return out;
+    }
+
+    public static void fillShoeCategoriesList(Sko s) {
+        List<Integer> kategoriIds = SkoKategoriMap.allShoeCategoryMappings.stream()
+                .filter(k -> k.getSkoId() == s.getId())
+                .map(SkoKategoriMap::getKategoriId).collect(Collectors.toList());
+
+        for (Kategori k : Kategori.allCategories) {
+            for (Integer i : kategoriIds) {
+                if (i == k.getId()) {
+                    s.getKategoriList().add(k);
+                }
+            }
+        }
     }
 
     public static void finalizeOrder(int beställningsid) {
