@@ -315,7 +315,6 @@ public class Repository {
                 temp.setLagerstatus(rs.getInt("lagerstatus"));
                 temp.setCreated(rs.getDate("created"));
                 temp.setLastUpdated(rs.getDate("lastUpdated"));
-                //fillShoeCategoriesList(temp);
                 parseShoeCategories(temp);
 //                System.out.println("* * * * * * * * * * * * * HEJ * * * * * * * * * * * * *");
 //                System.out.println(temp.getKategoriList());
@@ -326,6 +325,34 @@ public class Repository {
             e.printStackTrace();
         }
         return out;
+    }
+
+    public static Kund getCustomerByUsernameAndPassword(String username, String password){
+        Kund k = null;
+        try (Connection con = DriverManager.getConnection(
+                properties.getProperty("dbString"),
+                properties.getProperty("username"),
+                properties.getProperty("password"))) {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+
+            PreparedStatement pstmt = con.prepareStatement("select * from kund where användarnamn like ?" +
+                    "and lösenord like ?");
+            pstmt.setString(1, username);
+            pstmt.setString(2, password);
+            ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                k = new Kund();
+                k.setId(rs.getInt("id"));
+                k.setNamn(rs.getString("namn"));
+                k.setOrt(getOrtFromDB(k.getId()));
+                k.setAnvändarnamn(rs.getString("användarnamn"));
+                k.setLösenord(rs.getString("lösenord"));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return k;
     }
 
 

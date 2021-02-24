@@ -20,7 +20,6 @@ public class Meny {
     }
 
     public void loginMenu(){
-        List<Kund> kundList = Repository.getAllCustomers();
 
         String användarnamn;
         String lösenord;
@@ -31,13 +30,9 @@ public class Meny {
             användarnamn = scan.nextLine();
             System.out.println("Skriv in lösenord:");
             lösenord = scan.nextLine();
-            for(Kund kund : kundList){
-                if (kund.getAnvändarnamn().equals(användarnamn) && kund.getLösenord().equals(lösenord)){
-                    k = kund;
-                    found = true;
-                    mainMenu();
-                    break;
-                }
+            if((k = Repository.getCustomerByUsernameAndPassword(användarnamn, lösenord)) != null){
+                found = true;
+                mainMenu();
             }
             if (!found) {
                 System.out.println("Användarnamn eller lösenord är fel, försök igen");
