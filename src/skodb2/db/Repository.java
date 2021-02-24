@@ -338,8 +338,10 @@ public class Repository {
             PreparedStatement pstmt = con.prepareStatement("update beställning set avslutad = true where id=?");
             pstmt.setInt(1, beställningsid);
             int i = pstmt.executeUpdate();
-            System.out.println(i + " rader påverkade");
-            System.out.println("Beställning färdigställd");
+            System.out.println("SQL: " + i + " rader påverkade");
+            if (i > 0) {
+                System.out.println("Beställning färdigställd");
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
