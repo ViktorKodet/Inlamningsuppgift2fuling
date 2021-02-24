@@ -35,7 +35,7 @@ public class Meny {
                 mainMenu();
             }
             if (!found) {
-                System.out.println("Användarnamn eller lösenord är fel, försök igen");
+                System.out.println("Användarnamn eller lösenord är fel, försök igen.");
             }
         }
     }

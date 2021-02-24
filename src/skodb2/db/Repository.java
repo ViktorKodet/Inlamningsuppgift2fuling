@@ -368,7 +368,7 @@ public class Repository {
             int i = pstmt.executeUpdate();
             System.out.println("SQL: " + i + " rader påverkade");
             if (i > 0) {
-                System.out.println("Beställning färdigställd");
+                System.out.println("Beställning färdigställd.");
             }
         } catch (Exception e) {
             e.printStackTrace();
