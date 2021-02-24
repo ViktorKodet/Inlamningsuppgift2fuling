@@ -349,6 +349,8 @@ public class Repository {
                 k.setOrt(getOrtFromDB(k.getId()));
                 k.setAnvändarnamn(rs.getString("användarnamn"));
                 k.setLösenord(rs.getString("lösenord"));
+                k.setCreated(rs.getDate("created"));
+                k.setLastUpdated(rs.getDate("lastupdated"));
             }
         } catch (Exception e) {
             e.printStackTrace();
