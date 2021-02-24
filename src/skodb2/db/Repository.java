@@ -242,26 +242,26 @@ public class Repository {
         return out;
     }
 
-//    public static void parseShoeCategories(Sko s) {
-//        try (Connection con = DriverManager.getConnection(
-//                properties.getProperty("dbString"),
-//                properties.getProperty("username"),
-//                properties.getProperty("password"))) {
-//            Class.forName("com.mysql.cj.jdbc.Driver");
-//            PreparedStatement pstmt = con.prepareStatement("select * from skokategorimap where skoid = ?");
-//            pstmt.setInt(1, s.getId());
-//            ResultSet rs = pstmt.executeQuery();
-//            while (rs.next()) {
-//                int temp = rs.getInt("kategoriId");
-//                for (Kategori k : Kategori.allCategories) {
-//                    if (k.getId() == temp)
-//                        s.getKategoriList().add(k);
-//                }
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//    }
+    public static void parseShoeCategories(Sko s) {
+        try (Connection con = DriverManager.getConnection(
+                properties.getProperty("dbString"),
+                properties.getProperty("username"),
+                properties.getProperty("password"))) {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            PreparedStatement pstmt = con.prepareStatement("select * from skokategorimap where skoid = ?");
+            pstmt.setInt(1, s.getId());
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                int temp = rs.getInt("kategoriId");
+                for (Kategori k : Kategori.allCategories) {
+                    if (k.getId() == temp)
+                        s.getKategoriList().add(k);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     public static List<Beställning> getAllOrders(Kund k) {
         List<Beställning> out = new ArrayList<>();
@@ -328,7 +328,7 @@ public class Repository {
 
             while (rs.next()) {
                 Sko temp = new Sko();
-                temp.setId(rs.getInt("id"));
+                temp.setId(rs.getInt("skoid"));
                 temp.setNamn(rs.getString("namn"));
                 temp.setPris(rs.getInt("pris"));
                 int märkeid = rs.getInt("märkeid");
@@ -338,12 +338,12 @@ public class Repository {
                 temp.setLagerstatus(rs.getInt("lagerstatus"));
                 temp.setCreated(rs.getDate("created"));
                 temp.setLastUpdated(rs.getDate("lastUpdated"));
-                fillShoeCategoriesList(temp);
-
+                //fillShoeCategoriesList(temp);
+                parseShoeCategories(temp);
                 System.out.println("* * * * * * * * * * * * * HEJ * * * * * * * * * * * * *");
                 System.out.println(temp.getKategoriList());
 
-//                parseShoeCategories(temp);
+//
                 out.add(temp);
             }
         } catch (Exception e) {
