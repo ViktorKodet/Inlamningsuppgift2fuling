@@ -31,8 +31,8 @@ create table kund
 (id int not null auto_increment,
 namn varchar(50) not null,
 ortid int not null,
-användarnamn varchar(50) not null,  -- nytt
-lösenord varchar(50) not null,      -- nytt
+användarnamn varchar(50) not null,
+lösenord varchar(50) not null,
 primary key(id),
 foreign key(ortid) references ort(id), -- kan även sätta ON DELETE SET NULL om en stad skulle försvinna av oförklarliga skäl, men då har vi inte längre en komplett historik...
 created timestamp default CURRENT_TIMESTAMP,
@@ -45,7 +45,7 @@ pris int not null,
 storlek int not null,
 färg enum ('Svart', 'Rosa', 'Röd', 'Vit', 'Camo', 'Grön'),
 märkeid int not null,
-lagerstatus int,       -- Alternativt null för att visa att den inte säljs längre så blir man av med tillgänglig
+lagerstatus int,
 primary key(id),
 foreign key(märkeid) references märke(id),
 created timestamp default CURRENT_TIMESTAMP,
@@ -56,7 +56,7 @@ create table beställning
 kundid int not null,
 primary key(id),
 datum date not null default (curdate()),
-avslutad boolean not null default false,    -- nytt
+avslutad boolean not null default false,
 foreign key(kundid) references kund(id),
 created timestamp default CURRENT_TIMESTAMP,
 lastUpdated timestamp default null on update CURRENT_TIMESTAMP);
@@ -105,12 +105,11 @@ primary key(id),
 skoid int not null,
 datum date not null default (curdate()),
 foreign key(skoid) references sko(id),
-created timestamp default CURRENT_TIMESTAMP, -- reduntant
+created timestamp default CURRENT_TIMESTAMP,
 lastUpdated timestamp default null on update CURRENT_TIMESTAMP);
 
 
 
--- Fyller tabellerna (Kund, sko och betygsättning måste uppdateras)
 
 insert into ort (namn) values ('Uppsala'), ('Stockholm'), ('Säffle'), ('Åmål'), ('Göteborg');
 
@@ -132,7 +131,7 @@ insert into kund (namn, ortid, användarnamn, lösenord) values
 
 insert into sko (namn, pris, storlek, färg, märkeid, lagerstatus) values 
 ('Ecco-sandalen', 399, 38, 'Svart', 2, 1), 
-('Nike fotbollssko', 999, 40, 'Grön', 1, 0), 
+('Nike fotbollssko', 999, 40, 'Grön', 1, 2), 
 ('Dunder-Kängan', 2400, 46, 'Camo', 6, null), 
 ('RUNFALCON', 479, 41, 'Svart', 3, 3), 
 ('Helt vanlig toffla', 2499, 44, 'Vit', 4, 39),
@@ -236,6 +235,8 @@ delimiter //
 create procedure addToCart(kundIdIN int, beställningsIdIN int, skoIdIN int)
 BEGIN
 declare lastId int default 0;
+declare no_longer_sold condition for sqlstate '45000';
+
 declare exit handler for SQLEXCEPTION
 begin
     rollback;
@@ -248,6 +249,12 @@ begin
     select('Felaktiga värden, rollback utförd');
     resignal set message_text = 'Felaktiga värden, rollback utförd';
 end;
+declare exit handler for no_longer_sold
+begin
+    rollback;
+    select('Skon säljs inte längre.');
+    resignal set message_text = 'Skon säljs inte längre.';
+end;
 
 start transaction;
 	if beställningsIdIN is null or (select count(*) from beställning where beställning.id like beställningsIdIN) = 0 then
@@ -256,6 +263,10 @@ start transaction;
     insert into beställningsmap(skoId, beställningsId) values (skoIdIN, lastId);
     else
     insert into beställningsmap(skoId, beställningsId) values (skoIdIN, beställningsIdIN);
+    end if;
+    
+    if (select sko.lagerstatus from sko where sko.id=skoIdIN) is null then
+    signal no_longer_sold;  -- nytt
     end if;
     
     if (select sko.lagerstatus from sko where sko.id=skoIdIN) > 0 then
@@ -298,5 +309,11 @@ select * from beställningsmap;
 select * from slutilager;
 */
 
-select * from beställning;
+-- select * from beställning;
+-- select * from sko;
+-- select * from kund;
+-- select * from slutilager;
+-- select * from beställningsmap;
+
+select * from ratings;
 

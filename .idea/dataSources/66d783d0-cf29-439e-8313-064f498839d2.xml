@@ -937,7 +937,7 @@ SELECT|sys.sys_config
       <Definer>root@localhost</Definer>
     </view>
     <routine id="299" parent="6" name="addToCart">
-      <SourceTextLength>1029</SourceTextLength>
+      <SourceTextLength>1376</SourceTextLength>
       <Definer>root@localhost</Definer>
       <RoutineKind>procedure</RoutineKind>
     </routine>
