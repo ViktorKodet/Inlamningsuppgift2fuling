@@ -316,7 +316,8 @@ public class Repository {
                 temp.setCreated(rs.getDate("created"));
                 temp.setLastUpdated(rs.getDate("lastUpdated"));
                 parseShoeCategories(temp);
-//                System.out.println("* * * * * * * * * * * * * HEJ * * * * * * * * * * * * *");
+
+//                System.out.println("* * * * * * * * * * * * * SHOWING ADRESSES FOR INSTANCES OF CATEGORY OBJECTS  * * * * * * * * * * * * *");
 //                System.out.println(temp.getKategoriList());
 
                 out.add(temp);
