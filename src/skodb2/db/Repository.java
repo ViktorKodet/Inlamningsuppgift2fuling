@@ -1,6 +1,7 @@
 package skodb2.db;
 
 import jdk.jfr.Category;
+import skodb2.menu.Meny;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -18,7 +19,6 @@ public class Repository {
         loadProperties();
         Märke.allBrands = getAllBrands();
         Kategori.allCategories = getAllCategories();
-        SkoKategoriMap.allShoeCategoryMappings = getAllShoeCategoryMappings();
     }
 
     private static void loadProperties() {
@@ -217,7 +217,7 @@ public class Repository {
     }
 
     public static Beställning getActiveOrder(Kund k) {
-        Beställning out = new Beställning();
+        Beställning out = null;
         try (Connection con = DriverManager.getConnection(
                 properties.getProperty("dbString"),
                 properties.getProperty("username"),
@@ -289,29 +289,6 @@ public class Repository {
         return out;
     }
 
-    public static List<SkoKategoriMap> getAllShoeCategoryMappings() {
-        List<SkoKategoriMap> out = new ArrayList<>();
-        try (Connection con = DriverManager.getConnection(
-                properties.getProperty("dbString"),
-                properties.getProperty("username"),
-                properties.getProperty("password"))) {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-
-            PreparedStatement pstmt = con.prepareStatement("select * from skokategorimap");
-            ResultSet rs = pstmt.executeQuery();
-
-            while (rs.next()) {
-                SkoKategoriMap temp = new SkoKategoriMap();
-                temp.setId(rs.getInt("id"));
-                temp.setSkoId(rs.getInt("skoid"));
-                temp.setKategoriId(rs.getInt("kategoriid"));
-                out.add(temp);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return out;
-    }
 
     public static List<Sko> getOrderProducts(Beställning b) {
         List<Sko> out = new ArrayList<>();
@@ -340,10 +317,9 @@ public class Repository {
                 temp.setLastUpdated(rs.getDate("lastUpdated"));
                 //fillShoeCategoriesList(temp);
                 parseShoeCategories(temp);
-                System.out.println("* * * * * * * * * * * * * HEJ * * * * * * * * * * * * *");
-                System.out.println(temp.getKategoriList());
+//                System.out.println("* * * * * * * * * * * * * HEJ * * * * * * * * * * * * *");
+//                System.out.println(temp.getKategoriList());
 
-//
                 out.add(temp);
             }
         } catch (Exception e) {
@@ -352,19 +328,6 @@ public class Repository {
         return out;
     }
 
-    public static void fillShoeCategoriesList(Sko s) {
-        List<Integer> kategoriIds = SkoKategoriMap.allShoeCategoryMappings.stream()
-                .filter(k -> k.getSkoId() == s.getId())
-                .map(SkoKategoriMap::getKategoriId).collect(Collectors.toList());
-
-        for (Kategori k : Kategori.allCategories) {
-            for (Integer i : kategoriIds) {
-                if (i == k.getId()) {
-                    s.getKategoriList().add(k);
-                }
-            }
-        }
-    }
 
     public static void finalizeOrder(int beställningsid) {
         try (Connection con = DriverManager.getConnection(
@@ -383,20 +346,25 @@ public class Repository {
     }
 
     public static void addToCart(int kundid, int beställningsid, int skoid) {
+        boolean inStock = isInStock(skoid);
+        boolean previousActiveOrder = (getActiveOrder(Meny.k) == null);
         try (Connection con = DriverManager.getConnection(
                 properties.getProperty("dbString"),
                 properties.getProperty("username"),
                 properties.getProperty("password"))) {
             Class.forName("com.mysql.cj.jdbc.Driver");
-            boolean inStock = isInStock(skoid);
             CallableStatement pstmt = con.prepareCall("call addToCart(?, ?, ?)");
             pstmt.setInt(1, kundid);
             pstmt.setInt(2, beställningsid);
             pstmt.setInt(3, skoid);
             pstmt.execute();
+            if(previousActiveOrder){
+                System.out.println("Ny beställning skapad.");
+            }
             System.out.println(inStock ? "Sko tillagd i beställningen" : "Sko tillagd men finns inte i lager.");
+
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            System.out.println("SQL: " + e.getMessage());
         } catch (ClassNotFoundException e2) {
             e2.printStackTrace();
         }
@@ -467,8 +435,11 @@ public class Repository {
     public static void printAvgRatingAndComments(int shoeid) {
         System.out.println("Genomsnittligt betyg : " + getAvgRating(shoeid));
         System.out.println("Kommentarer:");
-        getComments(shoeid).forEach(System.out::println);
-
+        getComments(shoeid).forEach(e -> {
+            if (!e.trim().isEmpty()){
+                System.out.println(e);
+            }
+        });
     }
 
     public static double getAvgRating(int shoeid) {

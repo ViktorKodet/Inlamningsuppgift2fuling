@@ -13,7 +13,7 @@ import java.util.Scanner;
 public class Meny {
 
     Scanner scan = new Scanner(System.in);
-    Kund k;
+    public static Kund k;
 
     Meny(){
         loginMenu();
@@ -111,6 +111,7 @@ public class Meny {
     }
 
     public void shoeOrderMenu(){
+        try{
         System.out.println("Mata in skons namn:");
         String name = scan.nextLine();
         System.out.println("Mata in skons färg:");
@@ -119,12 +120,10 @@ public class Meny {
         String sizeString = scan.nextLine();
         int size = Integer.parseInt(sizeString);
 
-        try{
             Repository.addToCart(k.getId(), Repository.getActiveOrderId(k), Repository.getShoeId(name, color, size));
 
         }catch (Exception e){
-            System.out.println("SQL : " + e.getMessage());
-            e.printStackTrace();
+            System.out.println("Ogiltliga värden");
         }
 
     }
@@ -144,6 +143,7 @@ public class Meny {
         }
     }
     public void shoeRatingMenu(){
+        try{
         System.out.println("Mata in skons namn:");
         String name = scan.nextLine();
         System.out.println("Mata in skons färg:");
@@ -156,10 +156,10 @@ public class Meny {
         int betyg = Integer.parseInt(betygString);
         System.out.println("Mata in din kommentar:");
         String kommentar = scan.nextLine();
-        try{
+
             Repository.rateShoe(Repository.getShoeId(name, color, size), k.getId(), betyg, kommentar);
         }catch (Exception e){
-            e.printStackTrace();
+            System.out.println("Ogiltliga värden");
         }
     }
 
