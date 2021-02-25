@@ -328,7 +328,7 @@ public class Repository {
         return out;
     }
 
-    public static Kund getCustomerByUsernameAndPassword(String username, String password){
+    public static Kund getCustomerByUsernameAndPassword(String username, String password) {
         Kund kund = null;
         try (Connection con = DriverManager.getConnection(
                 properties.getProperty("dbString"),
@@ -376,6 +376,8 @@ public class Repository {
             System.out.println("SQL: " + i + " rader påverkade");
             if (i > 0) {
                 System.out.println("Beställning färdigställd.");
+            } else if (i == 0) {
+                System.out.println(("Ingen aktiv beställning funnen."));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -395,7 +397,7 @@ public class Repository {
             pstmt.setInt(2, beställningsid);
             pstmt.setInt(3, skoid);
             pstmt.execute();
-            if(previousActiveOrder){
+            if (previousActiveOrder) {
                 System.out.println("Ny beställning skapad.");
             }
             System.out.println(inStock ? "Sko tillagd i beställningen" : "Sko tillagd men finns inte i lager.");
@@ -473,7 +475,7 @@ public class Repository {
         System.out.println("Genomsnittligt betyg : " + getAvgRating(shoeid));
         System.out.println("Kommentarer:");
         getComments(shoeid).forEach(e -> {
-            if (!e.trim().isEmpty()){
+            if (!e.trim().isEmpty()) {
                 System.out.println(e);
             }
         });
