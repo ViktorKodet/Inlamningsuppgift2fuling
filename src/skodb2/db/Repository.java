@@ -329,7 +329,7 @@ public class Repository {
     }
 
     public static Kund getCustomerByUsernameAndPassword(String username, String password){
-        Kund k = null;
+        Kund kund = null;
         try (Connection con = DriverManager.getConnection(
                 properties.getProperty("dbString"),
                 properties.getProperty("username"),
@@ -343,19 +343,24 @@ public class Repository {
             ResultSet rs = pstmt.executeQuery();
 
             while (rs.next()) {
-                k = new Kund();
-                k.setId(rs.getInt("id"));
-                k.setNamn(rs.getString("namn"));
-                k.setOrt(getOrtFromDB(k.getId()));
-                k.setAnvändarnamn(rs.getString("användarnamn"));
-                k.setLösenord(rs.getString("lösenord"));
-                k.setCreated(rs.getDate("created"));
-                k.setLastUpdated(rs.getDate("lastupdated"));
+                kund = new Kund();
+                kund.setId(rs.getInt("id"));
+                kund.setNamn(rs.getString("namn"));
+                kund.setOrt(getOrtFromDB(kund.getId()));
+                kund.setAnvändarnamn(rs.getString("användarnamn"));
+                kund.setLösenord(rs.getString("lösenord"));
+                kund.setCreated(rs.getDate("created"));
+                kund.setLastUpdated(rs.getDate("lastupdated"));
+                kund.beställningList = Repository.getAllOrders(kund);
+                for (Beställning b : kund.beställningList) {
+                    b.setKund(kund);
+                }
+                System.out.println(kund.beställningList);
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return k;
+        return kund;
     }
 
 

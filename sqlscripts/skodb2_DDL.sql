@@ -181,8 +181,7 @@ insert into betygsättning (skoid, kundid, betyg, kommentar) values
 -- Det känns rimligt att söka efter namn, tabellerna ändras inte mycket.
 create index IX_ortNamn on ort(namn); 
 create index IX_kategoriNamn on kategori(namn);
-create index IX_märkeNamn on märke(namn);	
-prodAvg
+create index IX_märkeNamn on märke(namn);
 
 delimiter //
 create function prodAvg(productId int) 
