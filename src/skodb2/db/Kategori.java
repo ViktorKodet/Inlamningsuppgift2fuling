@@ -12,11 +12,6 @@ public class Kategori {
     private Date created;
     private Date lastUpdated;
 
-    public Kategori(int id, String namn) {
-        this.id = id;
-        this.namn = namn;
-    }
-
     public Kategori(){}
 
     public int getId() {

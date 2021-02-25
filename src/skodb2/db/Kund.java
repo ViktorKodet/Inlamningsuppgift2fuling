@@ -14,12 +14,6 @@ public class Kund {
     private Date lastUpdated;
     List<Beställning> beställningList;
 
-
-    Kund(){
-        beställningList = Repository.getAllOrders(this);
-        beställningList.forEach(e -> e.setKund(this));
-    }
-
     public int getId() {
         return id;
     }

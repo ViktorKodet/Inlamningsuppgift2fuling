@@ -1,12 +1,8 @@
 package skodb2.menu;
 
-import skodb2.db.Beställning;
 import skodb2.db.Kund;
 import skodb2.db.Repository;
 import skodb2.db.Sko;
-
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Scanner;
 
