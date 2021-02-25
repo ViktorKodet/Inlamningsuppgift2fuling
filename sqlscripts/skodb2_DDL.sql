@@ -129,7 +129,7 @@ insert into kund (namn, ortid, användarnamn, lösenord) values
 ('Bengt Bengtsson', 5, 'Bengan', 'asdf123'),
 ('Magdalena Magnusson', 4, 'Maggan', 'asdf123');
 
-insert into sko (namn, pris, storlek, färg, märkeid, lagerstatus) values 
+insert into sko (namn, pris, storlek, färg, märkeid, lagerstatus) values -- om lagerstatus är null säljs inte skon
 ('Ecco-sandalen', 399, 38, 'Svart', 2, 1), 
 ('Nike fotbollssko', 999, 40, 'Grön', 1, 2), 
 ('Dunder-Kängan', 2400, 46, 'Camo', 6, null), 
@@ -197,7 +197,7 @@ delimiter ;
 -- select prodAvg(1);
 
 create view ratings as
-select s.namn, round(prodAvg(s.id), 1) as AverageRating , b.betygtext
+select s.namn, round(prodAvg(s.id), 1) as AverageRating , b.betygtext -- rundar av rating och hämtar närmst liggande betygstext
 from sko s
 left join betyg b
 on b.värde = round(prodAvg(s.id))
@@ -206,7 +206,7 @@ order by värde desc;
 -- select * from ratings;
 
 delimiter //
-create procedure rate (skoidIN int, kundidIN int, betygIN int, kommentarIN varchar(16000))
+create procedure rate (skoidIN int, kundidIN int, betygIN int, kommentarIN varchar(16000)) -- betygsätt en sko
 BEGIN
 declare exit handler for 1452
     begin
@@ -290,7 +290,7 @@ end //
 delimiter ;
 
 delimiter //
-create procedure getProdAvg(in productId int, out average double)
+create procedure getProdAvg(in productId int, out average double) -- wrapper stored proc for anrop från programmet
 begin
 	set average = round(prodAvg(productId), 1);
 end //
