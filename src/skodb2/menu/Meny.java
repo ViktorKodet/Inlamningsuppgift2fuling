@@ -5,6 +5,7 @@ import skodb2.db.Repository;
 import skodb2.db.Sko;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 public class Meny {
@@ -22,17 +23,24 @@ public class Meny {
         String lösenord;
 
         while (true) {
-            boolean found = false;
-            System.out.println("Skriv in användarnamn:");
-            användarnamn = scan.nextLine();
-            System.out.println("Skriv in lösenord:");
-            lösenord = scan.nextLine();
-            if ((k = Repository.getCustomerByUsernameAndPassword(användarnamn, lösenord)) != null) {
-                found = true;
-                mainMenu();
-            }
-            if (!found) {
-                System.out.println("Användarnamn eller lösenord är fel, försök igen.");
+            try {
+                boolean found = false;
+                System.out.println("Skriv in användarnamn:");
+                användarnamn = scan.nextLine();
+                System.out.println("Skriv in lösenord:");
+                lösenord = scan.nextLine();
+                if ((k = Repository.getCustomerByUsernameAndPassword(användarnamn, lösenord)) != null) {
+                    found = true;
+                    mainMenu();
+                }
+                if (!found) {
+                    System.out.println("Användarnamn eller lösenord är fel, försök igen.");
+                }
+            }catch (NoSuchElementException e){
+                System.out.println("Programmet avslutas.");
+                System.exit(0);
+            }catch (Exception e){
+                e.printStackTrace();
             }
         }
     }
